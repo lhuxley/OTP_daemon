@@ -1,0 +1,60 @@
+#!/bin/bash
+
+usage="usage: $0 encryptionport decryptionport"
+
+#use the standard version of echo
+echo=/bin/echo
+
+if test $# -gt 2 -o $# -lt 2
+then
+	${echo} $usage 1>&2
+	exit 1
+fi
+
+encport=$1
+decport=$2
+
+
+./keygen 255 > key255
+
+
+
+
+./enc_server $encport &
+./dec_server $decport &
+
+${echo} 'Given plaintext: '
+
+
+cat plaintext
+${echo}
+
+
+./enc_client plaintext key255 $encport > ciphertext
+
+${echo}
+${echo} 'Cyphertext: '
+
+
+cat ciphertext
+${echo}
+
+./dec_client ciphertext key255 $decport > plaintext_new
+
+${echo}
+${echo} 'New Plaintext: '
+
+
+cat plaintext_new
+
+${echo}
+${echo}
+
+
+
+
+
+killall -q -u $USER dec_client
+killall -q -u $USER dec_server
+killall -q -u $USER enc_client
+killall -q -u $USER enc_server
